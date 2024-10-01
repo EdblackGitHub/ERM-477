@@ -1,6 +1,8 @@
 from django.db import models
 from neomodel import StructuredNode, StringProperty, DateTimeProperty, BooleanProperty, IntegerProperty, RelationshipTo
 from datetime import datetime
+import uuid
+
 # Create your models here.
 
 class UIDNode(StructuredNode):
@@ -8,8 +10,8 @@ class UIDNode(StructuredNode):
     # Should this have a TermID or Term value and Definition value? 
     # Is the UID Service just supposed to generate UID's or is it supposed to store the relationships between different terms. 
     namespace = StringProperty(required=True)
-    updated_at = DateTimeProperty()
-    created_at = DateTimeProperty(default_now=True)
+    updated_at = DateTimeProperty(default=lambda: datetime.now())
+    created_at = DateTimeProperty(default=lambda: datetime.now())
 
     children = RelationshipTo('UIDNode', 'HAS_CHILD')
 
@@ -24,7 +26,7 @@ class UIDNode(StructuredNode):
     
 class CounterNode(StructuredNode):
     counter = IntegerProperty(default=0)
-    updated_at = DateTimeProperty(default_now=True)
+    updated_at = DateTimeProperty(default=lambda: datetime.now())
 
     @classmethod
     def get(cls):
@@ -46,3 +48,13 @@ class CounterNode(StructuredNode):
         counter.updated_at = datetime.now()
         counter.save()
         return counter
+
+
+class Provider(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    name = models.CharField(max_length=255)
+
+class LCVTerm(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    term = models.CharField(max_length=255)
+    ld_lcv_structure = models.CharField(max_length=255)  # Adjust as needed

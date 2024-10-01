@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from uuid import uuid5, NAMESPACE_URL
 import json
 from neomodel import db
 from .models import CounterNode, UIDNode
+from .forms import ProviderForm, LCVTermForm
 
 
 MAX_CHILDREN = 2**32 -1
@@ -35,3 +36,24 @@ def generate_uid_node(request: HttpRequest):
     parent_node.children.connect(new_child_node)
 
     return HttpResponse("{ 'uid': '" + str(local_uid) + "' }", content_type='application/json')
+
+# Provider and LCVTerm
+def create_provider(request):
+    if request.method == 'POST':
+        form = ProviderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('uid:success')
+    else:
+        form = ProviderForm()
+    return render(request, 'create_provider.html', {'form': form})
+
+def create_lcvterm(request):
+    if request.method == 'POST':
+        form = LCVTermForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('uid:success')
+    else:
+        form = LCVTermForm()
+    return render(request, 'create_lcvterm.html', {'form': form})

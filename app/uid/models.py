@@ -6,12 +6,12 @@ import uuid
 # Create your models here.
 
 class UIDNode(StructuredNode):
-    uid = StringProperty()
+    uid = StringProperty(default=lambda:str(uuid.uuid4())) # UUID if UID is not provided to ensure uniqueness and avoids conflits
     # Should this have a TermID or Term value and Definition value? 
     # Is the UID Service just supposed to generate UID's or is it supposed to store the relationships between different terms. 
     namespace = StringProperty(required=True)
-    updated_at = DateTimeProperty(default=lambda: datetime.now())
-    created_at = DateTimeProperty(default=lambda: datetime.now())
+    updated_at = DateTimeProperty(default_now=True) # Better time stamp handeling.
+    created_at = DateTimeProperty(default_now=True)
 
     children = RelationshipTo('UIDNode', 'HAS_CHILD')
 

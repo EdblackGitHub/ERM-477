@@ -5,7 +5,8 @@ import json
 from neomodel import db
 from .models import CounterNode, UIDNode
 from .forms import ProviderForm, LCVTermForm
-
+from django.http import JsonResponse
+from .models import Provider, LCVTerm
 
 MAX_CHILDREN = 2**32 -1
 
@@ -57,3 +58,25 @@ def create_lcvterm(request):
     else:
         form = LCVTermForm()
     return render(request, 'create_lcvterm.html', {'form': form})
+
+# Postman view
+def export_to_postman(request, uid):
+    try:
+        provider = Provider.objects.get(uid=uid)
+        data = {
+            'name': provider.name,
+            'uid': provider.uid,
+            # Add other fields you want to export
+        }
+    except Provider.DoesNotExist:
+        try:
+            lcv_term = LCVTerm.objects.get(uid=uid)
+            data = {
+                'name': lcv_term.name,
+                'uid': lcv_term.uid,
+                # Add other fields you want to export
+            }
+        except LCVTerm.DoesNotExist:
+            return JsonResponse({'error': 'UID not found'}, status=404)
+
+    return JsonResponse(data)

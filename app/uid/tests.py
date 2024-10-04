@@ -3,6 +3,9 @@ from unittest.mock import patch, MagicMock
 from .models import CounterNode
 from .models import Provider, LCVTerm
 from .utils import generate_uid, issue_uid, send_notification
+from django.urls import reverse
+from rest_framework.test import APITestCase
+
 
 class TestCounterNode(TestCase):
     @patch('app.uid.models.CounterNode.save')
@@ -96,4 +99,24 @@ class UIDGenerationTestCase(TestCase):
         # Assuming you have a function to send notifications
         self.assertTrue(send_notification(provider, provider_uid))
         self.assertTrue(send_notification(lcv_term, lcv_term_uid))
-        #Test Changes
+
+class ExportToPostmanTestCase(APITestCase):
+
+    def test_export_provider(self):
+        provider = Provider.objects.create(name="Test Provider", uid="P-1234567890")
+        url = reverse('export_to_postman', args=[provider.uid])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['uid'], provider.uid)
+
+    def test_export_lcv_term(self):
+        lcv_term = LCVTerm.objects.create(name="Test LCV Term", uid="L-1234567890")
+        url = reverse('export_to_postman', args=[lcv_term.uid])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['uid'], lcv_term.uid)
+
+    def test_export_invalid_uid(self):
+        url = reverse('export_to_postman', args=["invalid-uid"])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)

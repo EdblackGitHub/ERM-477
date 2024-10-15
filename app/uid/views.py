@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
-from uuid import uuid5, NAMESPACE_URL
+#from uuid import uuid5, NAMESPACE_URL
 import json
 from neomodel import db
-from .models import CounterNode, UIDNode
+from .models import CounterNode, UIDNode, Provider, LCVTerm
 from .forms import ProviderForm, LCVTermForm
 from django.http import JsonResponse
-from .models import Provider, LCVTerm
+from .utils import generate_uid # import generate_uid 
+
 
 MAX_CHILDREN = 2**32 -1
 

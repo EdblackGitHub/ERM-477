@@ -1,12 +1,18 @@
 from django.db import models
 from neomodel import StructuredNode, StringProperty, DateTimeProperty, BooleanProperty, IntegerProperty, RelationshipTo
 from datetime import datetime
-import uuid
+from .utils import generate_uid # Import from generate_uid
+# import uuid
+# import hashlib
 
 # Create your models here.
 
+#def generate_uid(input_string):
+#    return hashlib.sha256(input_string.encode()).hexdigest()[:36] #Using a Hashlib we are generating our own UID.
+
 class UIDNode(StructuredNode):
-    uid = StringProperty(default=lambda:str(uuid.uuid4())) # UUID if UID is not provided to ensure uniqueness and avoids conflits
+    uid = StringProperty(default=lambda:generate_uid(str(datetime.now()))) # Updated string to no no longer use uuid4
+    # uid = StringProperty(default=lambda:str(uuid.uuid4())) # UUID if UID is not provided to ensure uniqueness and avoids conflits
     # Should this have a TermID or Term value and Definition value? 
     # Is the UID Service just supposed to generate UID's or is it supposed to store the relationships between different terms. 
     namespace = StringProperty(required=True)
@@ -51,10 +57,12 @@ class CounterNode(StructuredNode):
 
 
 class Provider(models.Model):
-    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uid = models.CharField(default=lambda: generate_uid(str(datetime.now())), max_length=36, editable=False, unique=True)
+    #uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=255)
 
 class LCVTerm(models.Model):
-    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uid = models.CharField(default=lambda: generate_uid(str(datetime.now())), max_length=36, editable=False, unique=True)
+    #uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     term = models.CharField(max_length=255)
     ld_lcv_structure = models.CharField(max_length=255)  # Adjust as needed

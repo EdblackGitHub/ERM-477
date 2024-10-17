@@ -72,7 +72,7 @@ class UIDGenerationTestCase(TestCase):
         self.assertNotIn(uid, [l.uid for l in LCVTerm.objects.all() if l.uid])
 
     def test_uid_generation_for_language_sets(self):
-        language_set = LanguageSet.objects.create #Added to test for LanguageSet UID
+        language_set = LanguageSet.objects.create # Added to test for LanguageSet UID
 
     def test_issuing_uid_to_providers(self):
         provider = Provider.objects.create(name="Test Provider")
